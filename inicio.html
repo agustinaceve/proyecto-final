@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Software de Ventas Acevedo</title>
+    <style>
+        /* Estilo general */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #f3f4f6;
+            color: #333;
+        }
+
+        /* Encabezado */
+        header {
+            text-align: center;
+            padding: 20px;
+            background-color: #1e90ff;
+            color: white;
+            width: 100%;
+        }
+
+        header h1 {
+            font-size: 2em;
+            margin-bottom: 5px;
+        }
+
+        header h2 {
+            font-size: 1.2em;
+            font-weight: 300;
+        }
+
+        /* Menú de navegación */
+        nav {
+            background-color: #ffffff;
+            width: 100%;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        nav ul {
+            display: flex;
+            justify-content: space-around;
+            list-style: none;
+            padding: 10px 0;
+        }
+
+        nav ul li a {
+            text-decoration: none;
+            color: #333;
+            font-weight: bold;
+            padding: 8px 16px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        nav ul li a:hover {
+            background-color: #1e90ff;
+            color: white;
+        }
+
+        /* Contenido principal */
+        main {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 20px;
+        }
+
+        .logo-section {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .logo-section img {
+            width: 150px;
+            height: auto;
+            margin-bottom: 10px;
+        }
+
+        .icons-section {
+            display: flex;
+            gap: 20px;
+        }
+
+        .icons-section img {
+            width: 100px;
+            height: auto;
+        }
+
+        /* Botones en el pie de página */
+        footer {
+            margin-top: auto;
+            padding: 20px;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            background-color: #ffffff;
+            box-shadow: 0px -2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        footer button {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        footer button:first-child {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        footer button:last-child {
+            background-color: #1e90ff;
+            color: white;
+        }
+
+        footer button:hover {
+            opacity: 0.9;
+        }
+        /* Estilo general para los botones */
+button {
+    padding: 12px 25px;
+    font-size: 16px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.2s, background-color 0.3s ease, box-shadow 0.3s;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+/* Estilo específico para el botón "Sacar Presupuesto" */
+#btnPresupuesto {
+    background-color: #1e90ff;
+    color: white;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+#btnPresupuesto:hover {
+    background-color: #4682b4;
+    transform: scale(1.05);
+    box-shadow: 0 8px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Estilo específico para el botón "Ir a Factura" */
+#btnFactura {
+    background-color: #32cd32;
+    color: white;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+#btnFactura:hover {
+    background-color: #28a745;
+    transform: scale(1.05);
+    box-shadow: 0 8px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Estilo para los botones en la vista móvil (opcional, para mejor presentación en pantallas pequeñas) */
+@media (max-width: 600px) {
+    button {
+        width: 100%;
+        font-size: 14px;
+        padding: 10px 20px;
+    }
+}
+
+    </style>
+</head>
+<body>
+
+    <!-- Encabezado -->
+    <header>
+        <h1>Software de Ventas Acevedo</h1>
+        <h2>Vidrios y Aluminios</h2>
+    </header>
+
+    <!-- Menú de navegación -->
+    <nav>
+        <ul>
+            <li><a href="usuario.html">Usuario</a></li>
+            
+            <li><a href="cliente.html">Clientes</a></li>
+            <li><a href="presupuesto.html">Presupuesto</a></li>
+            <li><a href="proveedores.html">Proveedores</a></li>
+            <li><a href="factura.html">Facturas</a></li>
+            <li><a href="ventas.html">Ventas</a></li>
+            <li><a href="producto.html">Productos</a></li>
+      
+        </ul>
+    </nav>
+
+    <main>
+        <div class="logo-section">
+            <img src="data:image/jpeg;base64,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" alt="Logo Vidrios y Aluminios">
+            <p>Software de Ventas Acevedo</p>
+        </div>
+       
+    </main>
+    <h1>Presupuesto y Factura</h1>
+
+    <!-- Sección con los dos botones -->
+    <div>
+        <button id="btnPresupuesto">Sacar Presupuesto</button>
+        <button id="btnFactura">Ir a Factura</button>
+    </div>
+
+    <!-- Formulario de presupuesto -->
+    <div id="presupuestoForm" style="display: none;">
+        <h2>Presupuesto</h2>
+        <form id="formPresupuesto">
+            <label for="producto">Producto:</label>
+            <input type="text" id="producto" name="producto" required>
+            <label for="cantidad">Cantidad:</label>
+            <input type="number" id="cantidad" name="cantidad" required>
+            <label for="precio">Precio por unidad:</label>
+            <input type="number" id="precio" name="precio" required>
+            <button type="button" onclick="agregarProducto()">Agregar Producto</button>
+        </form>
+        <h3>Lista de productos agregados</h3>
+        <ul id="listaProductos">
+            <!-- Aquí aparecerán los productos agregados -->
+        </ul>
+        <button type="button" onclick="imprimirPresupuesto()">Imprimir Presupuesto</button>
+    </div>
+
+    <!-- Pie de página -->
+    <footer>
+        <button onclick="cerrarApp()">Cerrar</button>
+       
+    </footer>
+
+    <script>
+         // Redirigir a la página presupuesto.html cuando se hace clic en el botón "Sacar Presupuesto"
+         document.getElementById("btnPresupuesto").addEventListener("click", () => {
+            window.location.href = "presupuesto.html";  // Redirigir a la página de presupuesto
+        });
+        function cerrarApp() {
+            alert("Cerrando la aplicación...");
+            window.location.href = "index.html";
+        
+        }
+
+        function facturar() {
+            alert("Iniciando el proceso de facturación...");
+            window.location.href = "factura-venta.html";
+
+           
+        }
+                // Mostrar y ocultar el formulario de presupuesto
+                document.getElementById("btnPresupuesto").addEventListener("click", () => {
+            document.getElementById("presupuestoForm").style.display = "block";  // Mostrar formulario
+        });
+
+        document.getElementById("btnFactura").addEventListener("click", () => {
+            window.location.href = "factura.html";  // Redirigir a la página de factura
+        });
+
+        
+    </script>
+
+</body>
+</html>

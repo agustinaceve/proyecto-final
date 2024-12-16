@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <title>Factura</title>
+    <style>
+        /* Aquí está tu código CSS existente */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            background-color: #f1f1f1;
+            border-radius: 8px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .header-info {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+
+        header h1 {
+            font-size: 2em;
+            font-weight: bold;
+            color: #1a73e8; /* Azul para el título */
+        }
+
+        section {
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            color: #b6c6db; /* Azul para los subtítulos */
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+
+        .client-info, .product-info, .summary-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .client-info input, .product-info input, .summary-info input {
+            width: 48%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #e3f2fd; /* Fondo azul claro para inputs */
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #1a73e8; /* Azul */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #155ab6; /* Azul más oscuro al pasar el mouse */
+        }
+
+        footer {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .summary-info input {
+            width: 100%;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #f3f4f6;
+            color: #333;
+        }
+
+        /* Encabezado */
+        header {
+            text-align: center;
+            padding: 20px;
+            background-color: #1e90ff;
+            color: white;
+            width: 100%;
+        }
+
+        header h1 {
+            font-size: 2em;
+            margin-bottom: 5px;
+        }
+
+        header h2 {
+            font-size: 1.2em;
+            font-weight: 300;
+        }
+
+        /* Menú de navegación */
+        nav {
+            background-color: #ffffff;
+            width: 100%;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        nav ul {
+            display: flex;
+            justify-content: space-around;
+            list-style: none;
+            padding: 10px 0;
+        }
+
+        nav ul li a {
+            text-decoration: none;
+            color: #333;
+            font-weight: bold;
+            padding: 8px 16px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        nav ul li a:hover {
+            background-color: #1e90ff;
+            color: white;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Factura</h1>
+            <div class="header-info">
+                <div>
+                    <label>Tipo:</label>
+                    <select id="tipo">
+                        <option value="A">A</option>
+                        <option value="B">B</option>
+                        <option value="C">C</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Fecha:</label>
+                    <input type="date" id="fecha" value="2024-11-04">
+                </div>
+                <div>
+                    <label>Número:</label>
+                    <input type="text" id="numero" value="0">
+                </div>
+            </div>
+        </header>
+
+        <section class="client-section">
+            <h2>Datos del Cliente</h2>
+            <div class="client-info">
+                <input type="text" placeholder="Código Cliente" id="codigoCliente">
+                <input type="text" placeholder="Nombre" id="nombre">
+                <input type="text" placeholder="Dirección" id="direccion">
+                <input type="text" placeholder="Teléfono" id="telefono">
+                <input type="text" placeholder="Correo" id="correo">
+               
+                <button class="redirect-button" onclick="window.location.href='cliente.html'">consultar Cliente</button>
+            </div>
+        </section>
+
+        <section class="product-section">
+            <h2>Datos del Producto</h2>
+            <div class="product-info">
+                <input type="text" placeholder="Código Producto" id="codigoProducto">
+                <input type="text" placeholder="Descripción" id="descripcion">
+                <input type="number" placeholder="Precio Unitario" id="precioUnitario" step="0.01">
+                <input type="number" placeholder="Cantidad" id="cantidad" step="1">
+                <button class="redirect-button" onclick="window.location.href='presupuesto.html'">presupuesto</button>
+                
+            </div>
+        </section>
+
+        <section class="payment-section">
+            <h2>Forma de Pago</h2>
+            <div class="payment-info">
+                <label for="formaPago">Seleccionar forma de pago:</label>
+                <select id="formaPago">
+                    <option value="efectivo">Efectivo</option>
+                    <option value="tarjeta_credito">Tarjeta de Crédito</option>
+                    <option value="tarjeta_debito">Tarjeta de Débito</option>
+                    <option value="codigo_qr">Código QR</option>
+                </select>
+
+             
+            </div>
+        </section>
+
+        <section class="summary-section">
+            <h2>Resumen</h2>
+            <div class="summary-info">
+                <div>
+                    <label>Subtotal:</label>
+                    <input type="text" id="subtotal" readonly>
+                </div>
+                <div>
+                    <label>IVA (21%):</label>
+                    <input type="text" id="iva" readonly>
+                </div>
+                <div>
+                    <label>Total:</label>
+                    <input type="text" id="total" readonly>
+                </div>
+            </div>
+        </section>
+
+        <footer>
+            <button class="redirect-button" onclick="window.location.href='inicio.html'">cerrar factura</button>
+            <button onclick="calcularFactura()">Facturar</button>
+            <button onclick="generarPDF()">Imprimir Factura</button>
+        </footer>
+    </div>
+
+    <script>
+         // Cargar los datos del cliente seleccionado al cargar la página
+         window.onload = function () {
+            const clienteSeleccionado = localStorage.getItem("clienteSeleccionado");
+            if (clienteSeleccionado) {
+                const cliente = JSON.parse(clienteSeleccionado);
+
+                // Llenar los campos con los datos del cliente
+                document.getElementById("nombre").value = cliente.nombre || '';
+                document.getElementById("direccion").value = cliente.direccion || '';
+                document.getElementById("telefono").value = cliente.telefono || '';
+                document.getElementById("correo").value = cliente.correo || '';
+                
+                // Limpiar el localStorage
+                localStorage.removeItem("clienteSeleccionado");
+            }
+        };
+
+        function cerrarFactura() {
+            alert("Factura cerrada.");
+        }
+       function consultarCliente() {
+    // Obtener el código del cliente del input
+    const codigoCliente = document.getElementById("codigoCliente").value;
+
+    // Verificar que el código de cliente no esté vacío
+    if (codigoCliente.trim() === "") {
+        alert("Por favor ingrese un código de cliente.");
+        return;
+    }
+
+    // Realizar la solicitud a PHP para consultar los datos del cliente
+    fetch(`consultarCliente.php?codigoCliente=${codigoCliente}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                alert(data.error);
+            } else {
+                // Si se encontró el cliente, llenar los campos con los datos
+                document.getElementById("nombre").value = data.nombre || '';
+                document.getElementById("direccion").value = data.direccion || '';
+                document.getElementById("telefono").value = data.telefono || '';
+                document.getElementById("correo").value = data.correo || '';
+            }
+        })
+        .catch(error => {
+            console.error('Error al consultar cliente:', error);
+            alert('Hubo un error al consultar los datos del cliente.');
+        });
+}
+
+
+        function calcularFactura() {
+            const precioUnitario = parseFloat(document.getElementById("precioUnitario").value) || 0;
+            const cantidad = parseFloat(document.getElementById("cantidad").value) || 0;
+
+            const subtotal = precioUnitario * cantidad;
+            const iva = subtotal * 0.21;
+            const total = subtotal + iva;
+
+            document.getElementById("subtotal").value = subtotal.toFixed(2);
+            document.getElementById("iva").value = iva.toFixed(2);
+            document.getElementById("total").value = total.toFixed(2);
+        }
+
+        function generarPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            doc.text("Factura", 20, 20);
+            doc.text(`Fecha: ${document.getElementById("fecha").value}`, 20, 30);
+            doc.text(`Número: ${document.getElementById("numero").value}`, 20, 40);
+            doc.text(`Cliente: ${document.getElementById("nombre").value}`, 20, 50);
+            doc.text(`Producto: ${document.getElementById("descripcion").value}`, 20, 60);
+            doc.text(`Subtotal: ${document.getElementById("subtotal").value}`, 20, 70);
+            doc.text(`IVA: ${document.getElementById("iva").value}`, 20, 80);
+            doc.text(`Total: ${document.getElementById("total").value}`, 20, 90);
+
+            doc.save("factura.pdf");
+        }
+
+        function cerrarFactura() {
+            alert("Factura cerrada.");
+        }
+    </script>
+</body>
+</html>

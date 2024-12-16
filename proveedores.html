@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Proveedores</title>
+    <style>
+        /* ===== Estilos Generales ===== */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f9ff;
+            color: #333;
+        }
+        h1, h2 {
+            color: #1e4e8e; /* Azul oscuro */
+            text-align: center;
+        }
+        hr {
+            margin: 20px 0;
+        }
+
+        /* ===== Formulario ===== */
+        form {
+            margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+            background-color: #e4f1fd;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        input, select, button {
+            padding: 10px;
+            font-size: 1em;
+            margin: 5px 0;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            width: 200px;
+        }
+        button {
+            background-color: #1e4e8e;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #155b8c;
+        }
+
+        /* ===== Tablas ===== */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ccc;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #1e4e8e;
+            color: white;
+        }
+        td {
+            background-color: #f9f9f9;
+        }
+
+        /* ===== Alertas y Secciones Específicas ===== */
+        #cotizacion {
+            margin-top: 20px;
+            font-size: 1.2em;
+            text-align: center;
+            color: #1e4e8e;
+        }
+        #pedidos {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #e4f1fd;
+            border-radius: 10px;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- ===== Título Principal ===== -->
+    <h1>Gestión de Proveedores</h1>
+
+    <!-- ===== Formulario para agregar o editar proveedores ===== -->
+    <form id="proveedorForm">
+        <input type="hidden" id="proveedorId" name="id">
+        <input type="text" id="nombre" name="nombre" placeholder="Nombre del Proveedor" required>
+        <input type="text" id="contacto" name="contacto" placeholder="Nombre de Contacto" required>
+        <input type="tel" id="telefono" name="telefono" placeholder="Teléfono" required>
+        <input type="email" id="correo" name="correo" placeholder="Correo Electrónico" required>
+        <input type="text" id="direccion" name="direccion" placeholder="Dirección" required>
+        <input type="text" id="productos" name="productos" placeholder="Productos que Suministra" required>
+        <input type="text" id="cuit" name="cuit" placeholder="CUIT" required>
+        <button type="submit">Guardar</button>
+        <button class="redirect-button" onclick="window.location.href='inicio.html'">Ir a Inicio</button>
+    </form>
+
+    <hr>
+
+    <!-- ===== Lista de Proveedores ===== -->
+    <h2>Lista de Proveedores</h2>
+    <input type="text" id="busqueda" placeholder="Buscar Proveedores...">
+    <button id="buscar">Buscar</button>
+    <table id="proveedoresTable">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Contacto</th>
+                <th>Teléfono</th>
+                <th>Correo</th>
+                <th>Dirección</th>
+                <th>Productos</th>
+                <th>CUIT</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Aquí se cargarán los proveedores -->
+        </tbody>
+    </table>
+
+    <hr>
+
+   
+    <script>
+        /* ===== Cargar Proveedores ===== */
+        const proveedorForm = document.getElementById("proveedorForm");
+        const proveedoresTable = document.getElementById("proveedoresTable").querySelector("tbody");
+
+        async function cargarProveedores() {
+            const response = await fetch("proveedores.php?action=list");
+            const proveedores = await response.json();
+            proveedoresTable.innerHTML = proveedores.map(proveedor => `
+                <tr>
+                    <td>${proveedor.nombre}</td>
+                    <td>${proveedor.contacto}</td>
+                    <td>${proveedor.telefono}</td>
+                    <td>${proveedor.correo}</td>
+                    <td>${proveedor.direccion}</td>
+                    <td>${proveedor.productos}</td>
+                    <td>${proveedor.cuit}</td>
+                    <td>
+                        <button onclick="editarProveedor(${proveedor.id})">Editar</button>
+                        <button onclick="eliminarProveedor(${proveedor.id})">Eliminar</button>
+                    </td>
+                </tr>
+            `).join("");
+        }
+
+        /* ===== Agregar o Editar Proveedor ===== */
+        proveedorForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const formData = new FormData(proveedorForm);
+            await fetch("proveedores.php?action=save", {
+                method: "POST",
+                body: formData,
+            });
+            proveedorForm.reset();
+            cargarProveedores();
+        });
+
+        /* ===== Eliminar Proveedor ===== */
+        async function eliminarProveedor(id) {
+            if (confirm("¿Estás seguro de eliminar este proveedor?")) {
+                await fetch(`proveedores.php?action=delete&id=${id}`);
+                cargarProveedores();
+            }
+        }
+
+        /* ===== Editar Proveedor ===== */
+        async function editarProveedor(id) {
+            const response = await fetch(`proveedores.php?action=get&id=${id}`);
+            const proveedor = await response.json();
+            for (const key in proveedor) {
+                if (proveedorForm[key]) proveedorForm[key].value = proveedor[key];
+            }
+        }
+
+        /* ===== Buscar Proveedores ===== */
+        document.getElementById("buscar").addEventListener("click", async () => {
+            const query = document.getElementById("busqueda").value;
+            const response = await fetch(`proveedores.php?action=search&query=${query}`);
+            const proveedores = await response.json();
+            proveedoresTable.innerHTML = proveedores.map(proveedor => `
+                <tr>
+                    <td>${proveedor.nombre}</td>
+                    <td>${proveedor.contacto}</td>
+                    <td>${proveedor.telefono}</td>
+                    <td>${proveedor.correo}</td>
+                    <td>${proveedor.direccion}</td>
+                    <td>${proveedor.productos}</td>
+                    <td>${proveedor.cuit}</td>
+                    <td>
+                        <button onclick="editarProveedor(${proveedor.id})">Editar</button>
+                        <button onclick="eliminarProveedor(${proveedor.id})">Eliminar</button>
+                    </td>
+                </tr>
+            `).join("");
+        });
+
+       
+        /* ===== Cargar Proveedores Inicialmente ===== */
+        cargarProveedores();
+    </script>
+</body>
+</html>

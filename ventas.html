@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Ventas</title>
+    <style>
+        /* Mantener el estilo anterior */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f9ff;
+            color: #333;
+        }
+
+        h1, h2 {
+            color: #1e4e8e;
+            text-align: center;
+        }
+
+        form {
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: #e4f1fd;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            font-size: 1.1em;
+            display: block;
+            margin-top: 10px;
+            color: #1e4e8e;
+        }
+
+        input, select, button {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            font-size: 1em;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            background-color: #1e4e8e;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #155b8c;
+        }
+
+        .error {
+            color: red;
+            font-size: 0.9em;
+        }
+
+        #response-message {
+            margin-top: 10px;
+            text-align: center;
+            font-size: 1.1em;
+        }
+
+        table {
+            width: 100%;
+            margin-top: 30px;
+            border-collapse: collapse;
+            border: 1px solid #ddd;
+        }
+
+        table th, table td {
+            padding: 10px;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+
+        table th {
+            background-color: #1e4e8e;
+            color: white;
+        }
+
+        table td {
+            background-color: #f9f9f9;
+        }
+
+        button.edit-btn, button.delete-btn {
+            margin: 0 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+
+        button.edit-btn {
+            background-color: #fbc02d;
+            color: white;
+        }
+
+        button.delete-btn {
+            background-color: #e53935;
+            color: white;
+        }
+
+        button.edit-btn:hover {
+            background-color: #f9a825;
+        }
+
+        button.delete-btn:hover {
+            background-color: #c62828;
+        }
+        #mostSoldProduct {
+    background-color: #f4f4f4;
+    padding: 10px;
+    margin-top: 20px;
+    border-radius: 5px;
+}
+
+#mostSoldProduct p {
+    font-size: 1.2em;
+}
+    </style>
+</head>
+<body>
+    <h1>Registro de Nueva Venta</h1>
+
+    <!-- Formulario de Registro -->
+    <form id="ventaForm">
+        <label for="cliente">Cliente:</label>
+        <input type="text" id="cliente" name="cliente" placeholder="Nombre del cliente" required>
+
+        <label for="producto">Producto:</label>
+        <input type="text" id="producto" name="producto" placeholder="Producto vendido" required>
+
+        <label for="cantidad">Cantidad:</label>
+        <input type="number" id="cantidad" name="cantidad" min="1" placeholder="Cantidad" required>
+
+        <label for="precio">Precio Unitario:</label>
+        <input type="number" id="precio" name="precio" step="0.01" placeholder="Precio por unidad" required>
+
+        <label for="fecha">Fecha de Venta:</label>
+        <input type="date" id="fecha" name="fecha" required>
+        
+
+        <button type="submit">Registrar Venta</button>
+    </form>
+
+    <div id="response-message"></div>
+
+    <h2>Ventas Registradas</h2>
+    <table id="ventasTable">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Cliente</th>
+                <th>Producto</th>
+                <th>Cantidad</th>
+                <th>Precio Unitario</th>
+                <th>Total</th>
+                <th>Fecha</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Aquí se insertarán las ventas dinámicamente -->
+        </tbody>
+    </table>
+    <div style="text-align: center; margin-top: 20px;">
+        <button class="redirect-button" onclick="window.location.href='inicio.html'">Ir a Inicio</button>
+    </div>
+    <h2>Producto Más Vendido</h2>
+<div id="mostSoldProduct">
+    <p>Cargando...</p>
+</div>
+
+    <script>
+        const ventaForm = document.getElementById("ventaForm");
+        const responseMessage = document.getElementById("response-message");
+        const ventasTable = document.getElementById("ventasTable").getElementsByTagName('tbody')[0];
+        let editId = null; // Variable para saber si estamos editando una venta
+
+        // Función para listar las ventas
+        async function listarVentas() {
+            try {
+                const response = await fetch("ventas.php?action=list");
+                const ventas = await response.json();
+
+                // Limpiar la tabla antes de mostrar los datos
+                ventasTable.innerHTML = '';
+
+                ventas.forEach(venta => {
+                    const row = ventasTable.insertRow();
+                    row.innerHTML = `
+                        <td>${venta.id}</td>
+                        <td>${venta.cliente}</td>
+                        <td>${venta.producto}</td>
+                        <td>${venta.cantidad}</td>
+                        <td>${venta.precio_unitario}</td>
+                        <td>${(venta.cantidad * venta.precio_unitario).toFixed(2)}</td>
+                        <td>${venta.fecha}</td>
+                        <td>
+                            <button class="edit-btn" onclick="editarVenta(${venta.id})">Editar</button>
+                            <button class="delete-btn" onclick="eliminarVenta(${venta.id})">Eliminar</button>
+                        </td>
+                    `;
+                });
+            } catch (error) {
+                responseMessage.style.color = "red";
+                responseMessage.textContent = "Error al cargar las ventas.";
+            }
+        }
+         // Función para obtener el producto más vendido
+    async function obtenerProductoMasVendido() {
+        try {
+            const response = await fetch("ventas.php?action=getMostSoldProduct");
+            const data = await response.json();
+
+            if (data.producto) {
+                document.getElementById("mostSoldProduct").innerHTML = `
+                    <p><strong>Producto:</strong> ${data.producto}</p>
+                    <p><strong>Total Vendido:</strong> ${data.total_vendido} unidades</p>
+                `;
+            } else {
+                document.getElementById("mostSoldProduct").innerHTML = `
+                    <p>${data.message}</p>
+                `;
+            }
+        } catch (error) {
+            document.getElementById("mostSoldProduct").innerHTML = `
+                <p style="color: red;">Error al cargar el producto más vendido.</p>
+            `;
+        }
+    }
+
+    // Llamar a la función para obtener el producto más vendido cuando se carga la página
+    window.onload = function() {
+        listarVentas(); // Cargar las ventas
+        obtenerProductoMasVendido(); // Obtener el producto más vendido
+    };
+
+        // Función para editar una venta
+        async function editarVenta(id) {
+            try {
+                const response = await fetch(`ventas.php?action=get&id=${id}`);
+                const venta = await response.json();
+
+                // Prellenar el formulario con los datos de la venta
+                document.getElementById("cliente").value = venta.cliente;
+                document.getElementById("producto").value = venta.producto;
+                document.getElementById("cantidad").value = venta.cantidad;
+                document.getElementById("precio").value = venta.precio_unitario;
+                document.getElementById("fecha").value = venta.fecha;
+
+                // Cambiar el botón para indicar que estamos editando
+                ventaForm.querySelector("button").textContent = "Actualizar Venta";
+                editId = id;
+            } catch (error) {
+                responseMessage.style.color = "red";
+                responseMessage.textContent = "Error al cargar los datos de la venta.";
+            }
+        }
+
+        // Función para eliminar una venta
+        async function eliminarVenta(id) {
+            const confirmDelete = confirm("¿Estás seguro de eliminar esta venta?");
+            if (confirmDelete) {
+                try {
+                    const response = await fetch(`ventas.php?action=delete&id=${id}`, {
+                        method: "GET"
+                    });
+                    const result = await response.json();
+
+                    if (result.success) {
+                        listarVentas(); // Actualizar la lista de ventas
+                        responseMessage.style.color = "green";
+                        responseMessage.textContent = "Venta eliminada con éxito.";
+                    } else {
+                        responseMessage.style.color = "red";
+                        responseMessage.textContent = "Error al eliminar la venta.";
+                    }
+                } catch (error) {
+                    responseMessage.style.color = "red";
+                    responseMessage.textContent = "Error al conectar con el servidor.";
+                }
+            }
+        }
+
+        // Cargar las ventas cuando se cargue la página
+        window.onload = listarVentas;
+
+        ventaForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            const formData = new FormData(ventaForm);
+            let action = "register";
+
+            // Si estamos editando una venta, cambiar la acción
+            if (editId) {
+                action = "update";
+                formData.append("id", editId);
+            }
+
+            try {
+                const response = await fetch(`ventas.php?action=${action}`, {
+                    method: "POST",
+                    body: formData,
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    responseMessage.style.color = "green";
+                    responseMessage.textContent = action === "register" ? "Venta registrada con éxito." : "Venta actualizada con éxito.";
+                    ventaForm.reset();
+                    editId = null; // Resetear el id de edición
+                    ventaForm.querySelector("button").textContent = "Registrar Venta";
+                    listarVentas(); // Actualizar la lista de ventas
+                } else {
+                    responseMessage.style.color = "red";
+                    responseMessage.textContent = result.message;
+                }
+            } catch (error) {
+                responseMessage.style.color = "red";
+                responseMessage.textContent = "Error al registrar la venta.";
+            }
+        });
+    </script>
+</body>
+</html>

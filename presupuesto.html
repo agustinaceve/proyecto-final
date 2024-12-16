@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Presupuesto de Vidrios</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 900px;
+            margin: 30px auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        label {
+            font-size: 14px;
+            font-weight: bold;
+            margin-top: 10px;
+            display: block;
+        }
+        input[type="number"], select, button {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .product-table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+        .product-table th, .product-table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+        }
+        .product-table th {
+            background-color: #f2f2f2;
+        }
+        .product-table td {
+            background-color: #f9f9f9;
+        }
+        .description {
+            font-size: 14px;
+            color: #555;
+            margin-top: 20px;
+        }
+        .description strong {
+            font-weight: bold;
+        }
+        .print-btn {
+            margin-top: 20px;
+            background-color: #1E90FF;
+            color: white;
+        }
+        .redirect-button {
+            margin-top: 30px;
+            display: block;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Presupuesto de Vidrios</h1>
+
+        <form id="presupuestoForm">
+            <label for="producto">Selecciona un Producto</label>
+            <select id="producto" name="producto" required>
+                <option value="">Cargando productos...</option>
+            </select>
+
+            <label for="ancho">Ancho (cm)</label>
+            <input type="number" id="ancho" name="ancho" required placeholder="Ingrese el ancho">
+
+            <label for="alto">Alto (cm)</label>
+            <input type="number" id="alto" name="alto" required placeholder="Ingrese el alto">
+
+            <button type="submit">Agregar Producto</button>
+        </form>
+
+        <table class="product-table" id="tablaProductos">
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th>Ancho (cm)</th>
+                    <th>Alto (cm)</th>
+                    <th>Cantidad</th>
+                    <th>Total</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Aquí se agregarán los productos -->
+            </tbody>
+        </table>
+
+        <div class="description">
+            <p><strong>Este presupuesto es válido por 72 horas.</strong></p>
+        </div>
+
+        <button class="print-btn" id="imprimirPresupuesto">Imprimir Presupuesto</button>
+        <button type="button" class="redirect-button" onclick="window.location.href='inicio.html'">Ir a inicio</button>
+
+        <button type="button" id="confirmarPresupuesto" class="redirect-button">Confirmar y Crear Factura</button>
+    </div>
+
+    <script>
+        // Cargar los productos desde la base de datos
+        fetch('presupuesto.php')
+            .then(response => response.json())
+            .then(productos => {
+                const selectProducto = document.getElementById('producto');
+                selectProducto.innerHTML = '<option value="">Selecciona un Producto</option>';
+                productos.forEach(producto => {
+                    selectProducto.innerHTML += `<option value="${producto.id}" data-precio="${producto.precio}">${producto.nombre}</option>`;
+                });
+            })
+            .catch(error => {
+                console.error('Error al cargar los productos:', error);
+            });
+
+        // Agregar productos a la tabla
+        document.getElementById("presupuestoForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            const productoSelect = document.getElementById("producto");
+            const productoId = productoSelect.value;
+            const productoNombre = productoSelect.options[productoSelect.selectedIndex].text;
+            const precio = parseFloat(productoSelect.options[productoSelect.selectedIndex].getAttribute("data-precio"));
+            const ancho = parseFloat(document.getElementById("ancho").value);
+            const alto = parseFloat(document.getElementById("alto").value);
+
+            if (!productoId || ancho <= 0 || alto <= 0) {
+                alert("Por favor, completa todos los campos correctamente.");
+                return;
+            }
+
+            const area = (ancho / 100) * (alto / 100); // Área en metros cuadrados
+            const total = area * precio;
+
+            // Agregar producto a la tabla
+            const table = document.getElementById("tablaProductos").getElementsByTagName('tbody')[0];
+            const newRow = table.insertRow();
+            newRow.dataset.precio = precio;
+
+            newRow.innerHTML = `
+                <td>${productoNombre}</td>
+                <td>${ancho}</td>
+                <td>${alto}</td>
+                <td>
+                    <button class="decrementar">-</button>
+                    <span class="cantidad">1</span>
+                    <button class="incrementar">+</button>
+                </td>
+                <td class="total">${total.toFixed(2)}</td>
+                <td><button class="eliminar">Eliminar</button></td>
+            `;
+
+            // Actualizar cantidad y total
+            newRow.querySelector('.incrementar').addEventListener('click', function() {
+                const cantidadSpan = newRow.querySelector('.cantidad');
+                let cantidad = parseInt(cantidadSpan.textContent);
+                cantidad++;
+                cantidadSpan.textContent = cantidad;
+                actualizarTotal(newRow, cantidad, area);
+            });
+
+            newRow.querySelector('.decrementar').addEventListener('click', function() {
+                const cantidadSpan = newRow.querySelector('.cantidad');
+                let cantidad = parseInt(cantidadSpan.textContent);
+                if (cantidad > 1) {
+                    cantidad--;
+                    cantidadSpan.textContent = cantidad;
+                    actualizarTotal(newRow, cantidad, area);
+                }
+            });
+
+            newRow.querySelector('.eliminar').addEventListener('click', function() {
+                newRow.remove();
+            });
+        });
+
+        function actualizarTotal(row, cantidad, area) {
+            const precio = parseFloat(row.dataset.precio);
+            const totalCell = row.querySelector('.total');
+            totalCell.textContent = (precio * area * cantidad).toFixed(2);
+        }
+
+        // Imprimir presupuesto
+        document.getElementById("imprimirPresupuesto").addEventListener("click", function() {
+            window.print();
+        });
+
+        // Confirmar y guardar presupuesto en localStorage para la factura
+        document.getElementById("confirmarPresupuesto").addEventListener("click", function() {
+            const productos = [];
+            const rows = document.getElementById("tablaProductos").getElementsByTagName('tbody')[0].rows;
+
+            for (let row of rows) {
+                const producto = {
+                    nombre: row.cells[0].textContent,
+                    ancho: row.cells[1].textContent,
+                    alto: row.cells[2].textContent,
+                    cantidad: parseInt(row.querySelector('.cantidad').textContent),
+                    total: parseFloat(row.querySelector('.total').textContent)
+                };
+                productos.push(producto);
+            }
+
+            // Guardar productos en localStorage
+            localStorage.setItem('presupuesto', JSON.stringify(productos));
+
+            // Redirigir a la página de factura
+            window.location.href = 'factura.html';
+        });
+    </script>
+</body>
+</html>

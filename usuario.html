@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Usuarios</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(to bottom, #c9d6ff, #e2e2e2);
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            font-size: 2.2em;
+            color: #333;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+        button {
+            padding: 8px 15px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .form-container {
+            margin-top: 20px;
+            text-align: center;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        input[type="text"], input[type="password"] {
+            padding: 12px;
+            margin: 10px;
+            width: 100%;
+            max-width: 300px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            transition: border-color 0.3s;
+        }
+        input[type="text"]:focus, input[type="password"]:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+
+        .form-container h3 {
+            font-size: 1.6em;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        /* Modal de confirmación */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            overflow: auto;
+            transition: opacity 0.3s ease;
+        }
+        .modal-content {
+            background-color: #fff;
+            margin: 10% auto;
+            padding: 20px;
+            border-radius: 8px;
+            width: 50%;
+            text-align: center;
+            animation: fadeIn 0.5s ease-in;
+        }
+        .modal-button {
+            padding: 10px 20px;
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .modal-button:hover {
+            background-color: #c0392b;
+        }
+
+        /* Animación de Fade In */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Modal de éxito */
+        .success-modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            overflow: auto;
+        }
+        .success-modal-content {
+            background-color: #fff;
+            margin: 10% auto;
+            padding: 20px;
+            border-radius: 8px;
+            width: 50%;
+            text-align: center;
+        }
+        .success-modal-button {
+            padding: 10px 20px;
+            background-color: #1b11a7;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .success-modal-button:hover {
+            background-color: #2f119c;
+        }
+
+        /* Botón de redirección */
+        .redirect-button {
+            padding: 10px 20px;
+            background-color: #0e0ae4;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .redirect-button:hover {
+            background-color: #732d91;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h3>Agregar/Modificar Usuario</h3>
+        <input type="hidden" id="userId" placeholder="ID (Solo para modificar)">
+        <input type="text" id="userName" placeholder="Nombre">
+        <input type="password" id="userPassword" placeholder="Contraseña">
+        <div>
+            <button onclick="agregarModificarUsuario()">Guardar</button>
+            <button onclick="limpiarFormulario()">Cancelar</button>
+        </div>
+        <div style="text-align: center; margin-top: 20px;">
+            <button class="redirect-button" onclick="window.location.href='inicio.html'">Ir a Inicio</button>
+        </div>
+    </div>
+    <div class="container">
+        <h1>Gestión de Usuarios</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Contraseña</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="userTableBody">
+                <!-- Usuarios serán cargados aquí -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Modal de confirmación -->
+    <div id="confirmationModal" class="modal">
+        <div class="modal-content">
+            <p>¿Estás seguro de que deseas eliminar este usuario?</p>
+            <button id="confirmDelete" class="modal-button">Aceptar</button>
+            <button id="cancelDelete" class="modal-button">Cancelar</button>
+        </div>
+    </div>
+
+    <!-- Modal de éxito -->
+    <div id="successModal" class="success-modal">
+        <div class="success-modal-content">
+            <p id="successMessage">Usuario eliminado exitosamente.</p>
+            <button id="successBtn" class="success-modal-button">Aceptar</button>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost/proyectop/user_crud.php';
+        let userIdToDelete = null;
+// Cargar usuarios (sin cambios)
+async function cargarUsuarios() {
+    try {
+        const response = await fetch(`${API_URL}?action=read`);
+        if (!response.ok) throw new Error('Error en la solicitud');
+
+        const usuarios = await response.json();
+        const tableBody = document.getElementById("userTableBody");
+        tableBody.innerHTML = "";
+
+        usuarios.forEach(user => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td>${user.id}</td>
+                <td>${user.nombre}</td>
+                <td>${user.contraseña}</td>
+                <td>
+                    <button onclick="cargarUsuario(${user.id}, '${user.nombre}', '${user.contraseña}')">Modificar</button>
+                    <button onclick="confirmarEliminarUsuario(${user.id})">Eliminar</button>
+                </td>
+            `;
+            tableBody.appendChild(row);
+        });
+    } catch (error) {
+        console.error('Error:', error);
+        mostrarMensajeExito("No se pudieron cargar los usuarios.");
+    }
+}
+
+// Función para cargar datos de un usuario en el formulario
+function cargarUsuario(id, nombre, contraseña) {
+    document.getElementById("userId").value = id; // Carga el ID oculto en el formulario
+    document.getElementById("userName").value = nombre;
+    document.getElementById("userPassword").value = contraseña;
+
+    // Mensaje para indicar que se está editando un usuario
+    mostrarMensajeExito("Usuario cargado para modificar.");
+}
+
+// Agregar o modificar usuario (ajuste en la lógica)
+async function agregarModificarUsuario() {
+    const id = document.getElementById("userId").value;
+    const nombre = document.getElementById("userName").value.trim();
+    const contraseña = document.getElementById("userPassword").value.trim();
+
+    // Validar campos vacíos
+    if (!nombre || !contraseña) {
+        mostrarMensajeExito("Por favor, completa todos los campos.");
+        return;
+    }
+
+    const action = id ? 'update' : 'create'; // Determina si es un nuevo usuario o modificación
+    const body = id
+        ? { id, nombre, contraseña } // Si hay un ID, es una modificación
+        : { nombre, contraseña };   // Si no hay ID, es un nuevo usuario
+
+    try {
+        const response = await fetch(`${API_URL}?action=${action}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body),
+        });
+
+        if (!response.ok) throw new Error('Error en la solicitud');
+        const mensaje = id ? 'Usuario modificado con éxito.' : 'Usuario agregado con éxito.';
+        mostrarMensajeExito(mensaje);
+        cargarUsuarios(); // Recargar tabla después de agregar/modificar
+        limpiarFormulario(); // Limpia el formulario
+    } catch (error) {
+        console.error('Error:', error);
+        mostrarMensajeExito('Hubo un error al guardar el usuario.');
+    }
+}
+
+// Función para limpiar el formulario
+function limpiarFormulario() {
+    document.getElementById("userId").value = ""; // Limpia el campo oculto del ID
+    document.getElementById("userName").value = "";
+    document.getElementById("userPassword").value = "";
+}
+
+// Confirmar eliminación
+function confirmarEliminarUsuario(id) {
+    userIdToDelete = id;
+    document.getElementById("confirmationModal").style.display = "block";
+}
+
+// Eliminar usuario (sin cambios)
+async function eliminarUsuario() {
+    if (userIdToDelete === null) return;
+
+    try {
+        const response = await fetch(`${API_URL}?action=delete&id=${userIdToDelete}`, {
+            method: 'POST',
+        });
+
+        if (!response.ok) throw new Error('Error en la solicitud');
+        mostrarMensajeExito("Usuario eliminado exitosamente.");
+        cargarUsuarios(); // Recargar la tabla después de eliminar
+    } catch (error) {
+        console.error('Error:', error);
+        mostrarMensajeExito('Hubo un error al eliminar el usuario.');
+    } finally {
+        document.getElementById("confirmationModal").style.display = "none";
+    }
+}
+
+// Mostrar mensaje de éxito (sin cambios)
+function mostrarMensajeExito(mensaje) {
+    document.getElementById("successMessage").innerText = mensaje;
+    document.getElementById("successModal").style.display = "block";
+}
+
+// Función para cancelar la eliminación
+function cancelarEliminar() {
+    document.getElementById("confirmationModal").style.display = "none";
+    userIdToDelete = null;
+}
+
+// Cerrar modal de éxito
+function cerrarModalExito() {
+    document.getElementById("successModal").style.display = "none";
+    userIdToDelete = null;
+}
+
+// Eventos (sin cambios)
+document.getElementById("confirmDelete").onclick = eliminarUsuario;
+document.getElementById("cancelDelete").onclick = cancelarEliminar;
+document.getElementById("successBtn").onclick = cerrarModalExito;
+
+// Cargar usuarios al inicio
+window.onload = cargarUsuarios;
+    </script>
+</body>
+</html>

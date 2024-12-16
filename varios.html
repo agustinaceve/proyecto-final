@@ -1,0 +1,69 @@
+<body>
+    <h1>Presupuesto y Factura</h1>
+
+    <!-- Sección con los dos botones -->
+    <div>
+        <button id="btnPresupuesto">Sacar Presupuesto</button>
+        <button id="btnFactura">Ir a Factura</button>
+    </div>
+
+    <!-- Formulario de presupuesto -->
+    <div id="presupuestoForm" style="display: none;">
+        <h2>Presupuesto</h2>
+        <form id="formPresupuesto">
+            <label for="producto">Producto:</label>
+            <input type="text" id="producto" name="producto" required>
+            <label for="cantidad">Cantidad:</label>
+            <input type="number" id="cantidad" name="cantidad" required>
+            <label for="precio">Precio por unidad:</label>
+            <input type="number" id="precio" name="precio" required>
+            <button type="button" onclick="agregarProducto()">Agregar Producto</button>
+        </form>
+        <h3>Lista de productos agregados</h3>
+        <ul id="listaProductos">
+            <!-- Aquí aparecerán los productos agregados -->
+        </ul>
+        <button type="button" onclick="imprimirPresupuesto()">Imprimir Presupuesto</button>
+    </div>
+
+    <script>
+        // Mostrar y ocultar el formulario de presupuesto
+        document.getElementById("btnPresupuesto").addEventListener("click", () => {
+            document.getElementById("presupuestoForm").style.display = "block";  // Mostrar formulario
+        });
+
+        document.getElementById("btnFactura").addEventListener("click", () => {
+            window.location.href = "factura.html";  // Redirigir a la página de factura
+        });
+
+        // Función para agregar productos al presupuesto
+        function agregarProducto() {
+            const producto = document.getElementById("producto").value;
+            const cantidad = document.getElementById("cantidad").value;
+            const precio = document.getElementById("precio").value;
+            
+            if (producto && cantidad && precio) {
+                const listaProductos = document.getElementById("listaProductos");
+                const li = document.createElement("li");
+                li.innerText = `${producto} - Cantidad: ${cantidad} - Precio: $${precio}`;
+                listaProductos.appendChild(li);
+
+                // Limpiar el formulario después de agregar el producto
+                document.getElementById("formPresupuesto").reset();
+            } else {
+                alert("Por favor, complete todos los campos.");
+            }
+        }
+
+        // Función para imprimir el presupuesto
+        function imprimirPresupuesto() {
+            const presupuesto = document.getElementById("presupuestoForm").innerHTML;
+            const ventanaImpresion = window.open("", "_blank");
+            ventanaImpresion.document.write("<html><head><title>Presupuesto</title></head><body>");
+            ventanaImpresion.document.write(presupuesto);
+            ventanaImpresion.document.write("</body></html>");
+            ventanaImpresion.document.close();
+            ventanaImpresion.print();
+        }
+    </script>
+</body>
